@@ -17,8 +17,9 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 
 #	例子
 
-	var jsonTest tjson.Value = tjson.Value{}
-	var jsonTest2 tjson.Value = tjson.Value{}
+	//全是是指针操作 如果需要生成一份新的拷贝 调用Copy 暂时用不着 没去实现Copy 始终返回自己的指针
+	jsonTest := tjson.New()
+	jsonTest2 := tjson.New()
 
 	//如果是数组 -1就是插入到末尾
 	jsonTest2.Value("aaa").Value(-1, "111")
@@ -35,25 +36,14 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 	jsonTest.Value("333", true)
 	jsonTest.Value("obj", jsonTest2)
 
-	jsonStr := jsonTest.ToString()
+	jsonText3 := jsonTest.Value("obj").Value("aaa")
+	jsonText3.Insert(-1, jsonTest.Value("222").ToString())
+
+	jsonStr := jsonTest.Copy().ToString()
 	_=jsonStr
   
 
-  //jsonStr得到下面这个字符串 转出来是紧凑排列的 这里为了方便观察 在json网页上转了下
+  //jsonStr得到下面这个字符串 转出来是紧凑排列的 这里为了方便观察 在json网页上转下
 
 
-{
-    "111":{
-        "s111":"v1",
-        "s333":"v3"
-    },
-    "222":"v2",
-    "333":true,
-    "obj":{
-        "aaa":[
-            "ins11",
-            "222",
-            "333"
-        ]
-    }
-}
+{"111":{"s333":"v3","s111":"v1"},"222":"v2","333":true,"obj":{"aaa":["ins11","222","333","v2"]}}

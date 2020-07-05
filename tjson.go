@@ -43,6 +43,15 @@ type Value struct {
 	arrayItemCount int
 }
 
+func New() *Value {
+	return &Value{t:Null}
+}
+
+func (this* Value)Copy() *Value {
+
+	return this
+}
+
 func (this* Value)createValue(v interface{}) *Value {
 	var result *Value
 	switch keyValue := v.(type) {
@@ -57,6 +66,9 @@ func (this* Value)createValue(v interface{}) *Value {
 		break
 	case Value:
 		result = &keyValue
+		break
+	case *Value:
+		result = keyValue
 		break
 	default:
 		break
