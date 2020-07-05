@@ -15,9 +15,9 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 但是也可以这样判断 那string举例 jsonObject.Value("xxx").IsNull()  和上面的差不多 。唯一区别是不管这个xxx是否为null 都会创建一个null对象 上面那种则不会
 
 
-例子
+#	例子
 
-  var jsonTest tjson.Value = tjson.Value{}
+	var jsonTest tjson.Value = tjson.Value{}
 	var jsonTest2 tjson.Value = tjson.Value{}
 
 	//如果是数组 -1就是插入到末尾
