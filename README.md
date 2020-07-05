@@ -36,7 +36,7 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 	jsonStr := jsonTest.ToString()
 	_=jsonStr
   
-  //jsonStr得到下面这个字符串 转出来是紧凑排列的 这里为了方便观察 在json网页上转了下
+  //jsonStr得到下面这个字符串 
 
 {
     "111":{
