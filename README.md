@@ -39,7 +39,7 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 	jsonText3 := jsonTest.Value("obj").Value("aaa")
 	jsonText3.Insert(-1, jsonTest.Value("222").ToString())
 
-	jsonStr := jsonTest.Copy().ToString()
+	jsonStr := jsonTest.Copy().ToString() //Copy暂时没实现 始终返回自己指针
 	_=jsonStr
   
 
