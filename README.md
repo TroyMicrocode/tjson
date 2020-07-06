@@ -1,6 +1,5 @@
 # tjson
 
-//暂时没写解析代码 
 
 
 主要函数Value  可变参数 1个到2个 3个以上当2个处理
@@ -15,9 +14,9 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 但是也可以这样判断 那string举例 jsonObject.Value("xxx").IsNull()  和上面的差不多 。唯一区别是不管这个xxx是否为null 都会创建一个null对象 上面那种则不会
 
 
-#	例子
+#	例子 构建
 
-	//全是是指针操作 如果需要生成一份新的拷贝 调用Copy 暂时用不着 没去实现Copy 始终返回自己的指针
+	//全是是指针操作 如果需要生成一份新的拷贝 调用Copy
 	jsonTest := tjson.New()
 	jsonTest2 := tjson.New()
 
@@ -39,11 +38,27 @@ jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前�
 	jsonText3 := jsonTest.Value("obj").Value("aaa")
 	jsonText3.Insert(-1, jsonTest.Value("222").ToString())
 
-	jsonStr := jsonTest.Copy().ToString() //Copy暂时没实现 始终返回自己指针
+	jsonStr := jsonTest.Copy().ToString() //Copy
 	_=jsonStr
   
 
   //jsonStr得到下面这个字符串 转出来是紧凑排列的 这里为了方便观察 在json网页上转下
 
 
-{"111":{"s333":"v3","s111":"v1"},"222":"v2","333":true,"obj":{"aaa":["ins11","222","333","v2"]}}
+	{"111":{"s333":"v3","s111":"v1"},"222":"v2","333":true,"obj":{"aaa":["ins11","222","333","v2"]}}
+	
+#	例子 解析
+
+	stringTmp := `{"111":{"s333":"v3","s111":"v1"},"222":"v2","333":true,"obj":{"aaa":["ins11","222","333","v2"]}}`
+
+	jsonTest := tjson.New(stringTmp)
+	
+	这个时候就可以访问jsonTest来读取各个字段了
+	
+#	关于Copy
+	因为全是指针操作 假如一个tjson对象传给了某个函数 该函数内部对这个对象的操作会影响外部数据。如果不想函数内部修改数据的话传值的时候调用Copy
+	
+	jsonTest.Copy()
+	
+	这句就会生成和jsonTest完全一样但地址不一样的拷贝
+	这个Copy效率很低 懒得写了 。直接调用的转换成字符串再重新解析

@@ -62,6 +62,11 @@ func New(v ...interface{}) *Value {
 func (this* Value)Copy() *Value {
 
 	//暂时用效率低的方法 懒得写
+	if this.t == Null {
+		return &Value{t:Null}
+	}else if this.t == Number || this.t == Bool || this.t == String {
+		return this.createValue(this.value)
+	}
 
 	return New(this.ToString())
 }
