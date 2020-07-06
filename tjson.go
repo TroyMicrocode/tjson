@@ -58,6 +58,9 @@ func (this* Value)createValue(v interface{}) *Value {
 	case int:
 		result = &Value{t:Number, value: keyValue}
 		break
+	case int64:
+		result = &Value{t:Number, value: keyValue}
+		break
 	case string:
 		result = &Value{t:String, value: keyValue}
 		break
