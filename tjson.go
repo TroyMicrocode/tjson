@@ -416,7 +416,7 @@ func (this* Value)valueToString() string {
 				result += `"` + escapeString(k) + `":` + `"` + escapeString(v.value.(string)) + `"`
 				break
 			case Number:
-				result += `"` + escapeString(k) + `":` + fmt.Sprintf("%v", v.value.(int))
+				result += `"` + escapeString(k) + `":` + fmt.Sprintf("%v", v.value.(int64))
 				break
 			case Bool:
 				result += `"` + escapeString(k) + `":` + fmt.Sprintf("%v", v.value.(bool))
@@ -448,7 +448,7 @@ func (this* Value)valueToString() string {
 				result += `"` + escapeString(v.value.(string)) + `"`
 				break
 			case Number:
-				result += fmt.Sprintf("%v", v.value.(int))
+				result += fmt.Sprintf("%v", v.value.(int64))
 				break
 			case Bool:
 				result += fmt.Sprintf("%v", v.value.(bool))
