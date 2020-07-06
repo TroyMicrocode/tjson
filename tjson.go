@@ -70,10 +70,10 @@ func (this* Value)createValue(v interface{}) *Value {
 	var result *Value
 	switch keyValue := v.(type) {
 	case int:
-		result = &Value{t:Number, value: keyValue}
+		result = &Value{t:Number, value: int64(keyValue)}
 		break
 	case int64:
-		result = &Value{t:Number, value: int(keyValue)}
+		result = &Value{t:Number, value: keyValue}
 		break
 	case string:
 		result = &Value{t:String, value: keyValue}
@@ -86,6 +86,9 @@ func (this* Value)createValue(v interface{}) *Value {
 		break
 	case *Value:
 		result = keyValue
+		break
+	case int32:
+		result = &Value{t:Number, value: int64(keyValue)}
 		break
 	default:
 		break
@@ -471,16 +474,14 @@ func (this* Value)valueToString() string {
 
 
 
-func (this* Value)ToInt() int {
-	result := 0
+func (this* Value)ToInt() int64 {
 
 	switch this.t {
 	case Number:
-		result = this.value.(int)
-		break
+		return this.value.(int64)
 	}
 
-	return result
+	return 0
 }
 
 func (this* Value)ToBool() bool {
@@ -576,7 +577,7 @@ func parseDoc(doc interface{}) *Value {
 				a[i] = parseDoc(keyValue)
 				break
 			case float64:
-				a[i] = result.createValue(int(keyValue))
+				a[i] = result.createValue(int64(keyValue))
 				break
 			case string:
 				a[i] = result.createValue(keyValue)
