@@ -12,7 +12,11 @@ package tjson
 //		jsonObject.IsNull(string("xxx")) 或者 sonObject.IsNull(int(xxx)) 判断当前对象的xxx数据是否为null
 //		但是也可以这样判断 那string举例 jsonObject.Value("xxx").IsNull()  和上面的差不多 。唯一区别是不管这个xxx是否为null 都会创建一个null对象 上面那种则不会
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+)
 
 type Type int
 
@@ -43,13 +47,23 @@ type Value struct {
 	arrayItemCount int
 }
 
-func New() *Value {
+func New(v ...interface{}) *Value {
+	if len(v) == 0 {
+		return &Value{t:Null}
+	}
+	switch keyValue := v[0].(type) {
+	case string:
+		return parse(keyValue)
+		break
+	}
 	return &Value{t:Null}
 }
 
 func (this* Value)Copy() *Value {
 
-	return this
+	//暂时用效率低的方法 懒得写
+
+	return New(this.ToString())
 }
 
 func (this* Value)createValue(v interface{}) *Value {
@@ -345,6 +359,42 @@ func (this* Value)ArraySize() int {
 	return 0
 }
 
+func escapeString(str string) string{
+	result := ""
+	last := 0
+	i := 0
+	for ; i < len(str); i++  {
+		if str[i] <= 0x22 {
+			if str[i] == 0x22 {
+				result += str[last:i] + `\"`
+				last = i + 1
+			}else if str[i] == '\b' {
+				result += str[last:i] + `\b`
+				last = i + 1
+			}else if str[i] == '\f' {
+				result += str[last:i] + `\f`
+				last = i + 1
+			}else if str[i] == '\n' {
+				result += str[last:i] + `\n`
+				last = i + 1
+			}else if str[i] == '\r' {
+				result += str[last:i] + `\r`
+				last = i + 1
+			}else if str[i] == '\t' {
+				result += str[last:i] + `\t`
+				last = i + 1
+			}
+		}else if str[i] == '\\' {
+			result += str[last:i] + `\\`
+			last = i + 1
+		}
+
+	}
+	result += str[last:i]
+
+	return result
+}
+
 func (this* Value)valueToString() string {
 
 	var result string
@@ -352,26 +402,27 @@ func (this* Value)valueToString() string {
 	case Object:
 		result = `{`
 		i := 0
+		fmt.Println(reflect.TypeOf(this.value))
 		mapSize := len(this.value.(map[string]*Value))
 		for k, v := range this.value.(map[string]*Value) {
 			switch v.t {
 			case Null:
-				result += `"` + k + `":` + "null"
+				result += `"` + escapeString(k) + `":` + "null"
 				break
 			case String:
-				result += `"` + k + `":` + `"` + v.value.(string) + `"`
+				result += `"` + escapeString(k) + `":` + `"` + escapeString(v.value.(string)) + `"`
 				break
 			case Number:
-				result += `"` + k + `":` + fmt.Sprintf("%v", v.value.(int))
+				result += `"` + escapeString(k) + `":` + fmt.Sprintf("%v", v.value.(int))
 				break
 			case Bool:
-				result += `"` + k + `":` + fmt.Sprintf("%v", v.value.(bool))
+				result += `"` + escapeString(k) + `":` + fmt.Sprintf("%v", v.value.(bool))
 				break
 			case Object:
-				result += `"` + k + `":` + v.valueToString()
+				result += `"` + escapeString(k) + `":` + v.valueToString()
 				break
 			case Array:
-				result += `"` + k + `":` + v.valueToString()
+				result += `"` + escapeString(k) + `":` + v.valueToString()
 				break
 			}
 			if i != mapSize - 1 {
@@ -391,7 +442,7 @@ func (this* Value)valueToString() string {
 				result += "null"
 				break
 			case String:
-				result += `"` + v.value.(string) + `"`
+				result += `"` + escapeString(v.value.(string)) + `"`
 				break
 			case Number:
 				result += fmt.Sprintf("%v", v.value.(int))
@@ -476,3 +527,110 @@ func (this* Value)ToString() string {
 	return result
 }
 
+
+/**********************************************************解析*****************************************************************/
+
+func parseDoc(doc interface{}) *Value {
+
+	result := New()
+	//只会传进来数组或者对象
+	switch docValue := doc.(type) {
+	case map[string]interface{}:
+		//如果是map
+		m := map[string]*Value{}
+
+		for key, value := range docValue {
+			fmt.Printf("%s  %v\n", key, reflect.TypeOf(value))
+			switch keyValue := value.(type) {
+			case map[string]interface{}:
+				m[key] = parseDoc(keyValue)
+				break
+			case []interface{}:
+				m[key] = parseDoc(keyValue)
+				break
+			case float64:
+				m[key] = result.createValue(int(keyValue))
+				break
+			case string:
+				m[key] = result.createValue(keyValue)
+				break
+			case bool:
+				m[key] = result.createValue(keyValue)
+				break
+			}
+		}
+		if len(m) != 0 {
+			result.value = m
+			result.t = Object
+		}
+		break
+	case []interface{}:
+		//如果是数组
+		a := make([]*Value, len(docValue))
+		for i, value := range docValue  {
+			switch keyValue := value.(type) {
+			case map[string]interface{}:
+				a[i] = parseDoc(keyValue)
+				break
+			case []interface{}:
+				a[i] = parseDoc(keyValue)
+				break
+			case float64:
+				a[i] = result.createValue(int(keyValue))
+				break
+			case string:
+				a[i] = result.createValue(keyValue)
+				break
+			case bool:
+				a[i] = result.createValue(keyValue)
+				break
+			}
+		}
+		if len(a) != 0 {
+			result.value = a
+			result.t = Array
+			result.arrayItemCount = len(a)
+		}
+		break
+	}
+	return result
+}
+//暂时不自己做解析 用golang公开库
+func parse(jsonString string) *Value {
+
+	i := 0
+	result := New()
+	typeTmp := Null
+	for ; i < len(jsonString); i++ {
+		if jsonString[i] == '[' {
+			typeTmp = Array
+			break
+		}else if jsonString[i] == '{' {
+			typeTmp = Object
+			break
+		}
+	}
+
+	if typeTmp == Array {
+		var a []interface{}
+		err := json.Unmarshal([]byte(jsonString[i:]), &a)
+		if err != nil {
+			return result
+		}
+
+		return parseDoc(a)
+
+	}else if typeTmp == Object {
+		var m map[string]interface{}
+		err := json.Unmarshal([]byte(jsonString[i:]), &m)
+		if err != nil {
+			return result
+		}
+		return parseDoc(m)
+	}
+
+	return result
+	
+
+
+}
