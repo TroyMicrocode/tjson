@@ -494,7 +494,7 @@ func (this* Value)ToBool() bool {
 
 	switch this.t {
 	case Number:
-		if this.value.(int) != 0 {
+		if this.value.(int64) != 0 {
 			result = true
 		}
 		break
@@ -511,13 +511,13 @@ func (this* Value)ToString() string {
 	var result string
 	switch this.t {
 	case Null:
-		result = "null"
+		result = ""
 		break
 	case String:
 		result = this.value.(string)
 		break
 	case Number:
-		result = fmt.Sprintf("%v", this.value.(int))
+		result = fmt.Sprintf("%v", this.value.(int64))
 		break
 	case Bool:
 		result = fmt.Sprintf("%v", this.value.(bool))
