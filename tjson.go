@@ -410,7 +410,7 @@ func (this* Value)valueToString() string {
 	case Object:
 		result = `{`
 		i := 0
-		fmt.Println(reflect.TypeOf(this.value))
+		//fmt.Println(reflect.TypeOf(this.value))
 		mapSize := len(this.value.(map[string]*Value))
 		for k, v := range this.value.(map[string]*Value) {
 			switch v.t {
