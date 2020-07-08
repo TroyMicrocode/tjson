@@ -294,7 +294,7 @@ func (this* Value)Value(v ...interface{}) *Value {
 					this.arrayInsert(keyValue, valueTmp)
 				}
 			}
-			break
+			return this
 		case string:
 
 			valueTmp := this.createValue(v[1])
@@ -302,7 +302,7 @@ func (this* Value)Value(v ...interface{}) *Value {
 				this.setValue(keyValue, valueTmp)
 			}
 
-			break
+			return this
 		default:
 			_=keyValue
 			break
