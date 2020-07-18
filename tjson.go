@@ -15,6 +15,7 @@ package tjson
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 )
 
 type Type int
@@ -93,6 +94,9 @@ func (this* Value)createValue(v interface{}) *Value {
 		break
 	case int32:
 		result = &Value{t:Number, value: int64(keyValue)}
+		break
+	case nil:
+		result = &Value{}
 		break
 	default:
 		break
@@ -545,7 +549,7 @@ func parseDoc(doc interface{}) *Value {
 		m := map[string]*Value{}
 
 		for key, value := range docValue {
-			//fmt.Printf("%s  %v\n", key, reflect.TypeOf(value))
+			fmt.Printf("%s  %v\n", key, reflect.TypeOf(value))
 			switch keyValue := value.(type) {
 			case map[string]interface{}:
 				m[key] = parseDoc(keyValue)
@@ -560,6 +564,8 @@ func parseDoc(doc interface{}) *Value {
 				m[key] = result.createValue(keyValue)
 				break
 			case bool:
+				m[key] = result.createValue(keyValue)
+			case nil:
 				m[key] = result.createValue(keyValue)
 				break
 			}
@@ -587,6 +593,9 @@ func parseDoc(doc interface{}) *Value {
 				a[i] = result.createValue(keyValue)
 				break
 			case bool:
+				a[i] = result.createValue(keyValue)
+				break
+			case nil:
 				a[i] = result.createValue(keyValue)
 				break
 			}
