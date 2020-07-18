@@ -15,7 +15,6 @@ package tjson
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 )
 
 type Type int
@@ -549,7 +548,7 @@ func parseDoc(doc interface{}) *Value {
 		m := map[string]*Value{}
 
 		for key, value := range docValue {
-			fmt.Printf("%s  %v\n", key, reflect.TypeOf(value))
+			//fmt.Printf("%s  %v\n", key, reflect.TypeOf(value))
 			switch keyValue := value.(type) {
 			case map[string]interface{}:
 				m[key] = parseDoc(keyValue)
